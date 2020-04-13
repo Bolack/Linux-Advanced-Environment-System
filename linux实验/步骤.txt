@@ -1,0 +1,6 @@
+sudo passwd root	//重置root
+su		//进入root
+hostname lilingwei	//临时修改主机姓名
+/etc/hostname修改永久修改hostname
+
+g++ -I ./test main.cpp CAdderTester.cpp ./MyProject/CAdder.cpp   ./googletest/libgtest.a -o mytest

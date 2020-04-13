@@ -1,0 +1,2083 @@
+<!DOCTYPE html>
+<!-- saved from url=(0051)https://www.cnblogs.com/jiangzhaowei/p/8261174.html -->
+<html lang="zh-cn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="never">
+    <meta property="og:description" content="Linux的SOCKET编程详解 1. 网络中进程之间如何通信 进 程通信的概念最初来源于单机系统。由于每个进程都在自己的地址范围内运行，为保证两个相互通信的进 程之间既互不干扰又协调一致工作，操作系">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>Linux的SOCKET编程详解 - 江召伟 - 博客园</title>
+    
+    <link rel="stylesheet" href="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/blog-common.min.css">
+    <link id="MainCss" rel="stylesheet" href="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/bundle-cogitation.min.css">
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/bundle-cogitation-mobile.min.css">
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/jiangzhaowei/rss">
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/jiangzhaowei/rsd.xml">
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/jiangzhaowei/wlwmanifest.xml">
+    <script src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/amp4ads-host-v0.js.download"></script><script src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/pubads_impl_rendering_2019111801.js.download"></script><script async="" src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/analytics.js.download"></script><script src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/jquery-2.2.0.min.js.download"></script>
+    <script src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/blog-common.min.js.download"></script>
+    <script>
+        var currentBlogId = 173451;
+        var currentBlogApp = 'jiangzhaowei';
+        var cb_enable_mathjax = false;
+        var isLogined = false;
+    </script>
+    
+    
+    
+<link rel="preload" href="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/f.txt" as="script"><script type="text/javascript" src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/f.txt"></script><script src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/pubads_impl_2019111801.js.download" async=""></script><link rel="prefetch" href="https://tpc.googlesyndication.com/safeframe/1-0-36/html/container.html"></head>
+<body>
+    <a name="top"></a>
+    
+    <div id="top">
+	
+<div>
+	<table>
+		<tbody><tr>
+			<td class="HeaderTitles">
+				<h1 class="HeaderTitle"><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/jiangzhaowei/">qiuri2008</a>
+</h1>
+				<p id="tagline">
+
+</p>
+			</td>
+		</tr>
+	</tbody></table>
+</div>
+<div class="HeaderBar">
+	<table id="HeaderBar" class="HeaderBar" cellpadding="0" cellspacing="0">
+		<tbody><tr>
+			<td class="HeaderBarTab" nowrap="">
+&nbsp;
+<a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+ ::
+
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/jiangzhaowei/">
+首页</a>
+ ::
+<a href="http://q.cnblogs.com/" class="menu">博问</a> ::
+<a href="http://home.cnblogs.com/ing/" class="menu">闪存</a> ::
+
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+ ::
+
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E6%B1%9F%E5%8F%AC%E4%BC%9F">
+联系</a> ::
+
+<a id="blog_nav_rss" class="menu" href="https://www.cnblogs.com/jiangzhaowei/rss/">
+订阅</a>
+
+<a id="blog_nav_rss_image" href="https://www.cnblogs.com/jiangzhaowei/rss/">
+    <img src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/xml.gif" alt="订阅">
+</a> ::
+
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+ ::
+
+
+</td>
+			<td><img id="Header1_BlueTab" src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/BlueTabRight.gif" align="absmiddle" alt=""></td>
+			<td class="HeaderBarTabBack" nowrap="" width="100%">
+				<div class="BlogStatsBar">
+	<table class="BlogStatsBar">
+		<tbody><tr>
+			<td width="100%">
+			</td>
+			<td class="BlogStatsBar" nowrap="">
+				&nbsp;
+				
+1133 
+				随笔&nbsp;::
+				
+0 文章
+				::
+				
+42 评论
+				::
+				
+0 引用
+			</td>
+		</tr>
+	</tbody></table>
+</div>
+
+
+			</td>
+		</tr>
+	</tbody></table>
+</div>
+
+
+</div>
+<div id="leftmenu">	
+
+	    <div id="blog-calendar" style="">
+
+<table id="blogCalendar" class="Cal" cellspacing="0" cellpadding="0" title="Calendar" border="0">
+    <tbody>
+        <tr>
+            <td colspan="7">
+                <table class="CalTitle" cellspacing="0" border="0">
+                    <tbody>
+                        <tr>
+                            <td class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2019/10/27&#39;); return false;">&lt;</a>
+                            </td>
+                            <td align="center">2019年11月</td>
+                            <td align="right" class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2019/12/27&#39;); return false;">&gt;</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+                    <th class="CalDayHeader" align="center" abbr="日" scope="col">日</th>
+                    <th class="CalDayHeader" align="center" abbr="一" scope="col">一</th>
+                    <th class="CalDayHeader" align="center" abbr="二" scope="col">二</th>
+                    <th class="CalDayHeader" align="center" abbr="三" scope="col">三</th>
+                    <th class="CalDayHeader" align="center" abbr="四" scope="col">四</th>
+                    <th class="CalDayHeader" align="center" abbr="五" scope="col">五</th>
+                    <th class="CalDayHeader" align="center" abbr="六" scope="col">六</th>
+        </tr>
+            <tr>
+                            <td class="CalOtherMonthDay" align="center">27</td>
+                            <td class="CalOtherMonthDay" align="center">28</td>
+                            <td class="CalOtherMonthDay" align="center">29</td>
+                            <td class="CalOtherMonthDay" align="center">30</td>
+                            <td class="CalOtherMonthDay" align="center">31</td>
+                        <td class="" align="center">
+                            1
+                        </td>
+                    <td class="CalWeekendDay" align="center">
+                        2
+                    </td>
+            </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            3
+                        </td>
+                            <td class="" align="center">
+                                4
+                            </td>
+                            <td class="" align="center">
+                                5
+                            </td>
+                            <td class="" align="center">
+                                6
+                            </td>
+                            <td class="" align="center">
+                                <a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/11/07.html"><u>7</u></a>
+                            </td>
+                            <td class="" align="center">
+                                8
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            9
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            <a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/11/10.html"><u>10</u></a>
+                        </td>
+                            <td class="" align="center">
+                                11
+                            </td>
+                            <td class="" align="center">
+                                <a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/11/12.html"><u>12</u></a>
+                            </td>
+                            <td class="" align="center">
+                                13
+                            </td>
+                            <td class="" align="center">
+                                14
+                            </td>
+                            <td class="" align="center">
+                                <a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/11/15.html"><u>15</u></a>
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            16
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            17
+                        </td>
+                            <td class="" align="center">
+                                18
+                            </td>
+                            <td class="" align="center">
+                                19
+                            </td>
+                            <td class="" align="center">
+                                20
+                            </td>
+                            <td class="" align="center">
+                                21
+                            </td>
+                            <td class="" align="center">
+                                22
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            23
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            24
+                        </td>
+                            <td class="" align="center">
+                                25
+                            </td>
+                            <td class="" align="center">
+                                26
+                            </td>
+                            <td class="CalTodayDay" align="center">
+                                27
+                            </td>
+                            <td class="" align="center">
+                                28
+                            </td>
+                            <td class="" align="center">
+                                29
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            30
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalOtherMonthDay" align="center">
+                            1
+                        </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                2
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                3
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                4
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                5
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                6
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            7
+                        </td>
+                </tr>
+    </tbody>
+</table></div><script>loadBlogDefaultCalendar();</script>
+		
+<div id="sidebar_news" class="newsItem"><h3>公告</h3>
+<div class="News">
+	
+<div id="blog-news">
+    
+    <div id="profile_block">
+        昵称：
+        <a href="https://home.cnblogs.com/u/jiangzhaowei/">
+            江召伟
+        </a>
+        <br>
+        园龄：
+        <a href="https://home.cnblogs.com/u/jiangzhaowei/" title="入园时间：2014-01-03">
+            5年10个月
+        </a>
+        <br>
+        粉丝：
+        <a href="https://home.cnblogs.com/u/jiangzhaowei/followers/">
+            210
+        </a>
+        <br>
+        关注：
+        <a href="https://home.cnblogs.com/u/jiangzhaowei/followees/">
+            35
+        </a>
+        <div id="p_b_follow">
+<a href="javascript:void(0)" onclick="follow(&#39;ccdc2631-8274-e311-8d02-90b11c0b17d6&#39;)">+加关注</a></div>
+        <script>getFollowStatus('ccdc2631-8274-e311-8d02-90b11c0b17d6');</script>
+    </div>
+</div>
+</div>
+
+</div>
+
+		<div id="blog-sidecolumn">
+<!-- 搜索 -->
+<div id="sidebar_search" class="sidebar-block">
+    <div id="sidebar_search" class="mySearch">
+        <h3 class="catListTitle">搜索</h3>
+        <div id="sidebar_search_box">
+            <div id="widget_my_zzk" class="div_my_zzk">
+                <input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk">
+            </div>
+            <div id="widget_my_google" class="div_my_zzk">
+                <input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 常用链接 -->
+<div id="sidebar_shortcut" class="sidebar-block">
+    
+<h3 class="catListTitle">
+常用链接
+</h3>
+<ul>
+        <li>
+
+<a href="https://www.cnblogs.com/jiangzhaowei/p/" title="我的博客的随笔列表">我的随笔</a>
+</li>
+        <li>
+
+<a href="https://www.cnblogs.com/jiangzhaowei/MyComments.html" title="我的发表过的评论列表">我的评论</a>
+</li>
+        <li>
+
+<a href="https://www.cnblogs.com/jiangzhaowei/OtherPosts.html" title="我评论过的随笔列表">我的参与</a>
+</li>
+        <li>
+
+<a href="https://www.cnblogs.com/jiangzhaowei/RecentComments.html" title="我的博客的评论列表">最新评论</a>
+</li>
+        <li>
+
+<a href="https://www.cnblogs.com/jiangzhaowei/tag/" title="我的博客的标签列表">我的标签</a>
+</li>
+</ul>
+
+<!-- TODO: 检查是否有使用这一部分的控件，如果没有则应该删除。 -->
+<div id="itemListLin_con" style="display:none">
+    <ul>
+
+    </ul>
+</div>
+
+</div>
+
+<!-- 最新随笔 -->
+
+
+
+<!-- 我的标签 -->
+<div id="sidebar_toptags" class="sidebar-block">
+    
+</div>
+
+<!-- 积分与排名 -->
+
+
+<!-- 随笔分类、随笔档案、文章分类、新闻分类、相册、链接 -->
+<div id="sidebar_categories">
+    
+		<h3>
+
+随笔分类
+
+
+</h3>
+				<ul>
+			
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1110053.html" rel="" target="">
+    Android(40)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1280242.html" rel="" target="">
+    AngularJs(9)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/721110.html" rel="" target="">
+    C++(28)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1351156.html" rel="" target="">
+    DevOps(14)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1337537.html" rel="" target="">
+    Docker(20)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/684864.html" rel="" target="">
+    FFMPEG &amp; 音视频(18)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/657035.html" rel="" target="">
+    GCC及Makefile(22)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/792759.html" rel="" target="">
+    Git(28)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/835185.html" rel="" target="">
+    HDMI(4)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1130958.html" rel="" target="">
+    Iot(77)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/948835.html" rel="" target="">
+    JAVA(118)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1234128.html" rel="" target="">
+    JAVA WEB &amp; 微服务(61)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/638914.html" rel="" target="">
+    linux GDB(8)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/635348.html" rel="" target="">
+    linux IPC 通信(19)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/565555.html" rel="" target="">
+    linux shell(58)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/624491.html" rel="" target="">
+    linux 编程(69)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/682572.html" rel="" target="">
+    linux 服务器(52)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/636404.html" rel="" target="">
+    linux 进程(32)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/919489.html" rel="" target="">
+    linux 驱动(21)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1171287.html" rel="" target="">
+    linux 网络(32)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/644164.html" rel="" target="">
+    linux 线程(13)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/637204.html" rel="" target="">
+    linux 终端(9)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/774378.html" rel="" target="">
+    MFC(10)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/999327.html" rel="" target="">
+    MSTAR(21)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/823691.html" rel="" target="">
+    Perl(14)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1098043.html" rel="" target="">
+    PQ(5)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/654326.html" rel="" target="">
+    python(72)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/558196.html" rel="" target="">
+    qt(13)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/825584.html" rel="" target="">
+    RDA(40)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1206307.html" rel="" target="">
+    Renesas/ST(43)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1173346.html" rel="" target="">
+    RTOS(10)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1324050.html" rel="" target="">
+    Spring(6)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/767476.html" rel="" target="">
+    SQL(3)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/800984.html" rel="" target="">
+    SVN(33)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/564299.html" rel="" target="">
+    TS流分析(26)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/965109.html" rel="" target="">
+    UML(2)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/611554.html" rel="" target="">
+    VIM(4)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/951086.html" rel="" target="">
+    WEB 后端(25)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1189757.html" rel="" target="">
+    Zigbee(2)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1192313.html" rel="" target="">
+    大数据(2)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/825888.html" rel="" target="">
+    工具(73)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/668360.html" rel="" target="">
+    快捷键(9)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/627900.html" rel="" target="">
+    蓝牙(1)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/837772.html" rel="" target="">
+    面试题(11)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/826205.html" rel="" target="">
+    其它(3)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1246119.html" rel="" target="">
+    实例(21)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/651900.html" rel="" target="">
+    书籍推荐(14)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1049250.html" rel="" target="">
+    数据结构与算法(2)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/777508.html" rel="" target="">
+    数据库(25)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1319615.html" rel="" target="">
+    微信开发(2)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/639252.html" rel="" target="">
+    文件系统(4)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/673443.html" rel="" target="">
+    仪器(1)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/994645.html" rel="" target="">
+    移动互联H5开发(38)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/1105224.html" rel="" target="">
+    英语(6)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/835942.html" rel="" target="">
+    杂项(13)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/category/615538.html" rel="" target="">
+    正则表达式(4)
+</a>
+ 
+</li>
+			
+				</ul>
+		<h3>
+
+随笔档案
+
+
+</h3>
+				<ul>
+			
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/11.html" rel="" target="">
+    2019年11月(9)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/10.html" rel="" target="">
+    2019年10月(4)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/09.html" rel="" target="">
+    2019年9月(1)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/08.html" rel="" target="">
+    2019年8月(5)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/07.html" rel="" target="">
+    2019年7月(27)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/06.html" rel="" target="">
+    2019年6月(7)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/05.html" rel="" target="">
+    2019年5月(16)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/04.html" rel="" target="">
+    2019年4月(4)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/03.html" rel="" target="">
+    2019年3月(3)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/02.html" rel="" target="">
+    2019年2月(3)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2019/01.html" rel="" target="">
+    2019年1月(12)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/12.html" rel="" target="">
+    2018年12月(19)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/11.html" rel="" target="">
+    2018年11月(19)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/10.html" rel="" target="">
+    2018年10月(23)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/09.html" rel="" target="">
+    2018年9月(16)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/08.html" rel="" target="">
+    2018年8月(18)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/07.html" rel="" target="">
+    2018年7月(59)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/06.html" rel="" target="">
+    2018年6月(50)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/05.html" rel="" target="">
+    2018年5月(31)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/04.html" rel="" target="">
+    2018年4月(53)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/03.html" rel="" target="">
+    2018年3月(24)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/02.html" rel="" target="">
+    2018年2月(13)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2018/01.html" rel="" target="">
+    2018年1月(72)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2017/12.html" rel="" target="">
+    2017年12月(38)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2017/11.html" rel="" target="">
+    2017年11月(42)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2017/10.html" rel="" target="">
+    2017年10月(19)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2017/09.html" rel="" target="">
+    2017年9月(25)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2017/08.html" rel="" target="">
+    2017年8月(88)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2017/07.html" rel="" target="">
+    2017年7月(47)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2017/06.html" rel="" target="">
+    2017年6月(13)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2017/05.html" rel="" target="">
+    2017年5月(25)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2017/04.html" rel="" target="">
+    2017年4月(13)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2017/03.html" rel="" target="">
+    2017年3月(20)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2017/02.html" rel="" target="">
+    2017年2月(4)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2016/12.html" rel="" target="">
+    2016年12月(8)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2016/11.html" rel="" target="">
+    2016年11月(6)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2016/09.html" rel="" target="">
+    2016年9月(9)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2016/08.html" rel="" target="">
+    2016年8月(8)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2016/07.html" rel="" target="">
+    2016年7月(11)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2016/06.html" rel="" target="">
+    2016年6月(24)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2016/05.html" rel="" target="">
+    2016年5月(29)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2016/04.html" rel="" target="">
+    2016年4月(12)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2016/03.html" rel="" target="">
+    2016年3月(3)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2016/02.html" rel="" target="">
+    2016年2月(3)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2016/01.html" rel="" target="">
+    2016年1月(20)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2015/12.html" rel="" target="">
+    2015年12月(12)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2015/11.html" rel="" target="">
+    2015年11月(9)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2015/10.html" rel="" target="">
+    2015年10月(1)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2015/09.html" rel="" target="">
+    2015年9月(3)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2015/08.html" rel="" target="">
+    2015年8月(4)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2015/07.html" rel="" target="">
+    2015年7月(3)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2015/04.html" rel="" target="">
+    2015年4月(13)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2015/03.html" rel="" target="">
+    2015年3月(26)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2015/02.html" rel="" target="">
+    2015年2月(5)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2015/01.html" rel="" target="">
+    2015年1月(13)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2014/12.html" rel="" target="">
+    2014年12月(25)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2014/11.html" rel="" target="">
+    2014年11月(15)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2014/10.html" rel="" target="">
+    2014年10月(9)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2014/09.html" rel="" target="">
+    2014年9月(3)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2014/07.html" rel="" target="">
+    2014年7月(1)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2014/06.html" rel="" target="">
+    2014年6月(1)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2014/05.html" rel="" target="">
+    2014年5月(10)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2014/04.html" rel="" target="">
+    2014年4月(3)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2014/03.html" rel="" target="">
+    2014年3月(17)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2014/02.html" rel="" target="">
+    2014年2月(4)
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/jiangzhaowei/archive/2014/01.html" rel="" target="">
+    2014年1月(1)
+</a>
+ 
+</li>
+			
+				</ul>
+		<h3>
+
+[友情链接]
+
+
+</h3>
+				<ul>
+			
+				<li>
+<a href="http://blog.csdn.net/leixiaohua1020/" rel="nofollow noopener noreferrer" target="">
+    雷总 FFMPEG
+</a>
+ 
+</li>
+				<li>
+<a href="http://www.cnblogs.com/lidabo/" rel="nofollow noopener noreferrer" target="">
+    DoubleLi  FFMPEG
+</a>
+ 
+</li>
+				<li>
+<a href="http://www.cnblogs.com/kevingrace/" rel="nofollow noopener noreferrer" target="">
+    散尽浮华 视频监控
+</a>
+ 
+</li>
+				<li>
+<a href="http://blog.csdn.net/hguisu/" rel="nofollow noopener noreferrer" target="">
+    guisu
+</a>
+ 
+</li>
+				<li>
+<a href="http://blog.csdn.net/china_video_expert" rel="nofollow noopener noreferrer" target="">
+    音视频专家
+</a>
+ 
+</li>
+				<li>
+<a href="http://blog.csdn.net/phunxm/" rel="nofollow noopener noreferrer" target="">
+    流媒体
+</a>
+ 
+</li>
+				<li>
+<a href="http://blog.csdn.net/lishuhuakai/" rel="nofollow noopener noreferrer" target="">
+    网络
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.zhihu.com/question/50907897" rel="nofollow noopener noreferrer" target="">
+    微信小程序
+</a>
+ 
+</li>
+				<li>
+<a href="http://blog.csdn.net/column/details/rtos.html" rel="nofollow noopener noreferrer" target="">
+    RTOS
+</a>
+ 
+</li>
+				<li>
+<a href="http://www.cnblogs.com/zjutlitao/" rel="nofollow noopener noreferrer" target="">
+    zigbee
+</a>
+ 
+</li>
+				<li>
+<a href="http://www.cnblogs.com/nufangrensheng/" rel="nofollow noopener noreferrer" target="">
+    嵌入式
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.jianshu.com/u/657c611b2e07" rel="nofollow noopener noreferrer" target="">
+    猿码道
+</a>
+ 
+</li>
+				<li>
+<a href="http://www.cnblogs.com/xdp-gacl/" rel="nofollow noopener noreferrer" target="">
+    孤傲苍狼
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/firege/" rel="nofollow noopener noreferrer" target="">
+    野火
+</a>
+ 
+</li>
+				<li>
+<a href="https://www.cnblogs.com/zzb-Dream-90Time/category/949173.html" rel="" target="">
+    LCD
+</a>
+ 
+</li>
+			
+				</ul>
+
+
+</div>
+
+<!-- 最新评论 -->
+<div id="sidebar_recentcomments" class="sidebar-block">
+    <div id="recent_comments_wrap" class="RecentComment">
+    <h3 class="catListTitle">最新评论</h3>
+    <div class="RecentCommentBlock">
+        <ul>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/jiangzhaowei/p/9365056.html#4419504">1. Re:Javaweb经典三层架构的演变</a></li>
+                    <li class="recent_comment_body">这个网站从基础，前端，框架，数据库，Linux都有浅显易懂的讲解，不用怕不会，还有问答区帮助你学习，然后还有商城项目，量化投资项目可以学习...</li>
+                    <li class="recent_comment_author">--ahem</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/jiangzhaowei/p/7528099.html#4415683">2. Re:Kconfig详解-文件的基本要素 ***</a></li>
+                    <li class="recent_comment_body">感谢！！有图有文，清晰易懂！！</li>
+                    <li class="recent_comment_author">--eddiechiu</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/jiangzhaowei/p/7209949.html#4409721">3. Re:Java中断机制</a></li>
+                    <li class="recent_comment_body">你好 ，我有一个storm程序在本地运行的时候一直报ava.lang.RuntimeException: java.lang.RuntimeException: java.io.Interrupted...</li>
+                    <li class="recent_comment_author">--forborn</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/jiangzhaowei/p/8781635.html#4385655">4. Re:WebSocket、Socket、TCP、HTTP区别</a></li>
+                    <li class="recent_comment_body">好文顶</li>
+                    <li class="recent_comment_author">--Dc_Chen</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/jiangzhaowei/p/9534393.html#4355635">5. Re:IntellIJ IDEA 配置 Maven 以及 修改 默认 Repository***</a></li>
+                    <li class="recent_comment_body">写的很详细，赞</li>
+                    <li class="recent_comment_author">--马宇康</li>
+        </ul>
+    </div>
+</div>
+</div>
+
+
+
+<!-- 阅读排行榜 -->
+<div id="sidebar_topviewedposts" class="sidebar-block">
+    
+<div id="topview_posts_wrap">
+    <h3 class="catListTitle">阅读排行榜</h3>
+    <div id="TopViewPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/jiangzhaowei/p/6856566.html">
+                            1. PHP 数组转字符串，与字符串转数组(314608)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/jiangzhaowei/p/7881115.html">
+                            2. Linux下scp的用法***(71179)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/jiangzhaowei/p/8261174.html">
+                            3. Linux的SOCKET编程详解(40257)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/jiangzhaowei/p/9534393.html">
+                            4. IntellIJ IDEA 配置 Maven 以及 修改 默认 Repository***(40007)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/jiangzhaowei/p/7998515.html">
+                            5. Wireshark抓包分析TCP协议(35572)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div>
+</div>
+
+<!-- 评论排行榜 -->
+<div id="sidebar_topcommentedposts" class="sidebar-block">
+    
+<div id="topfeedback_posts_wrap">
+    <h3 class="catListTitle">评论排行榜</h3>
+    <div id="TopFeedbackPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/jiangzhaowei/p/5740913.html">
+                            1. python 深入理解 赋值、引用、拷贝、作用域(5)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/jiangzhaowei/p/5857844.html">
+                            2. Python中，添加写入数据到已经存在的Excel的xls文件，即打开excel文件，写入新数据(4)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/jiangzhaowei/p/8523543.html">
+                            3. rt-thread的定时器管理源码分析(2)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/jiangzhaowei/p/8298416.html">
+                            4. Lsyncd搭建同步镜像-用Lsyncd实现本地和远程服务器之间实时同步(2)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/jiangzhaowei/p/9570638.html">
+                            5. JAVA架构师面试题 一(2)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div>
+</div>
+
+<!-- 推荐排行榜 -->
+<div id="sidebar_topdiggedposts" class="sidebar-block">
+    
+<div id="topdigg_posts_wrap">
+    <div class="catListView">
+        <h3 class="catListTitle">推荐排行榜</h3>
+        <div id="TopDiggPostsBlock">
+            <ul style="word-break: break-all">
+                        <li>
+                            <a href="https://www.cnblogs.com/jiangzhaowei/p/5740913.html">
+                                1. python 深入理解 赋值、引用、拷贝、作用域(8)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/jiangzhaowei/p/9129105.html">
+                                2. C语言回调函数详解(6)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/jiangzhaowei/p/7998515.html">
+                                3. Wireshark抓包分析TCP协议(4)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/jiangzhaowei/p/7399522.html">
+                                4. Java 泛型 五：泛型与数组(3)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/jiangzhaowei/p/5856617.html">
+                                5. python中使用xlrd、xlwt操作excel表格详解(3)
+                            </a>
+                        </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</div></div>
+                    <script>loadBlogSideColumn();</script>
+	
+</div>
+<div id="main">
+	<div id="post_detail">
+<div class="post">
+	<div class="postTitle">
+		
+<a id="cb_post_title_url" class="postTitle2" href="https://www.cnblogs.com/jiangzhaowei/p/8261174.html">Linux的SOCKET编程详解</a>
+
+	</div>
+	
+	<div class="postText">
+		
+<div id="cnblogs_post_body" class="blogpost-body ">
+    <h2><span class="link_title"><a href="http://blog.csdn.net/hguisu/article/details/7445768" target="_blank">Linux的SOCKET编程详解</a></span></h2>
+<div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h2><a name="t1"></a></h2>
+<p class="headline-1 bk-sidecatalog-title">1. 网络中进程之间如何通信</p>
+<p>进 程通信的概念最初来源于单机系统。由于每个进程都在自己的地址范围内运行，为保证两个相互通信的进</p>
+<p>程之间既互不干扰又协调一致工作，操作系统为进程通信提供了相应设施，如</p>
+<p>UNIX BSD有：管道（pipe）、命名管道（named pipe）软中断信号（signal）</p>
+<p>UNIX system V有：消息（message）、共享存储区（shared memory）和信号量（semaphore)等.</p>
+<p>他们都仅限于用在本机进程之间通信。网间进程通信要解决的是不同主机进程间的相互通信问题（可把同机进程通信看作是其中的特例）。为此，首先要解决的是网间进程标识问题。同一主机上，不同进程可用进程号（process ID）唯一标识。但在网络环境下，各主机独立分配的进程号不能唯一标识该进程。例如，主机A赋于某进程号5，在B机中也可以存在5号进程，因此，“5号进程”这句话就没有意义了。&nbsp;其次，操作系统支持的网络协议众多，不同协议的工作方式不同，地址格式也不同。因此，网间进程通信还要解决多重协议的识别问题。&nbsp;</p>
+<p align="justify">其实TCP/IP协议族已经帮我们解决了这个问题，网络层的“<strong>ip地址</strong>”可以唯一标识网络中的主机，而传输层的“<strong>协议+端口</strong>”可以唯一标识主机中的应用程序（进程）。这样利用三元组（ip地址，协议，端口）就可以标识网络的进程了，网络中的进程通信就可以利用这个标志与其它进程进行交互。</p>
+<p align="justify">使用TCP/IP协议的应用程序通常采用应用编程接口：UNIX&nbsp; BSD的套接字（socket）和UNIX System V的TLI（已经被淘汰），来实现网络进程之间的通信。就目前而言，几乎所有的应用程序都是采用socket，而现在又是网络时代，网络中进程通信是无处不在，这就是我为什么说“一切皆socket”。</p>
+<p align="justify">&nbsp;</p>
+<p>&nbsp;</p>
+<h2><a name="t2"></a></h2>
+<p class="headline-1 bk-sidecatalog-title">2. 什么是TCP/IP、UDP</p>
+<p align="justify">&nbsp; &nbsp; &nbsp;TCP/IP（Transmission Control Protocol/Internet Protocol）即传输控制协议/网间协议，是一个工业标准的协议集，它是为广域网（WANs）设计的。&nbsp;&nbsp; &nbsp;</p>
+<p align="justify">&nbsp; &nbsp; &nbsp;TCP/IP协议存在于OS中，网络服务通过OS提供，在OS中增加支持TCP/IP的系统调用——Berkeley套接字，如Socket，Connect，Send，Recv等</p>
+<p align="justify">&nbsp; &nbsp; UDP（User Data Protocol，用户数据报协议）是与TCP相对应的协议。它是属于TCP/IP协议族中的一种。如图：</p>
+<p align="justify">&nbsp;</p>
+<p><img src="http://my.csdn.net/uploads/201204/10/1334044049_2497.jpg" alt=""></p>
+<p>&nbsp;</p>
+<p>&nbsp; &nbsp; &nbsp; TCP/IP协议族包括运输层、网络层、链路层，而socket所在位置如图，Socket是应用层与TCP/IP协议族通信的中间软件抽象层。</p>
+<p><img src="http://my.csdn.net/uploads/201204/10/1334044170_5136.jpg" alt=""></p>
+<p>&nbsp;</p>
+<h2><a name="t3"></a></h2>
+<p class="headline-1 bk-sidecatalog-title">3. Socket是什么</p>
+<h4><a name="t4"></a><strong>1、 socket套接字：</strong></h4>
+<p align="justify">&nbsp; &nbsp; &nbsp;socket起源于Unix，而Unix/Linux基本哲学之一就是“一切皆文件”，都可以用“打开open –&gt; 读写write/read –&gt; 关闭close”模式来操作。Socket就是该模式的一个实现， &nbsp; &nbsp; &nbsp; &nbsp;socket即是一种特殊的文件，一些socket函数就是对其进行的操作（读/写IO、打开、关闭）.<br data-filtered="filtered">&nbsp; &nbsp; &nbsp;说白了Socket是应用层与TCP/IP协议族通信的中间软件抽象层，<strong>它是一组接口</strong>。在设计模式中，Socket其实就是一个门面模式，它把复杂的TCP/IP协议族隐藏在Socket接口后面，对用户来说，一组简单的接口就是全部，让Socket去组织数据，以符合指定的协议。</p>
+<p align="justify">&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;注意：其实socket也没有层的概念，它只是一个facade设计模式的应用，让编程变的更简单。是一个软件抽象层。在网络编程中，我们大量用的都是通过socket实现的。</p>
+<h4><a name="t5"></a><strong>2、套接字描述符</strong></h4>
+<p align="justify">&nbsp;</p>
+<p>&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;其实就是一个整数，我们最熟悉的句柄是0、1、2三个，0是标准输入，1是标准输出，2是标准错误输出。0、1、2是整数表示的，对应的FILE *结构的表示就是stdin、stdout、stderr</p>
+<p>&nbsp;</p>
+<p>套接字API最初是作为UNIX操作系统的一部分而开发的，所以套接字API与系统的其他I/O设备集成在一起。特别是，当应用程序要为因特网通信而创建一个套接字（socket）时，操作系统就返回一个小整数作为描述符（descriptor）来标识这个套接字。然后，应用程序以该描述符作为传递参数，通过调用函数来完成某种操作（例如通过网络传送数据或接收输入的数据）。</p>
+<p>在许多操作系统中，套接字描述符和其他I/O描述符是集成在一起的，所以应用程序可以对文件进行套接字I/O或I/O读/写操作。</p>
+<p>当应用程序要创建一个套接字时，操作系统就返回一个小整数作为描述符，应用程序则使用这个描述符来引用该套接字需要I/O请求的应用程序请求操作系统打开一个文件。操作系统就创建一个文件描述符提供给应用程序访问文件。从应用程序的角度看，文件描述符是一个整数，应用程序可以用它来读写文件。下图显示，操作系统如何把文件描述符实现为一个指针数组，这些指针指向内部数据结构。</p>
+<p><img src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/20140820234143234" alt=""></p>
+<p>&nbsp; &nbsp; &nbsp;对于每个程序系统都有一张单独的表。精确地讲，系统为每个运行的进程维护一张单独的文件描述符表。当进程打开一个文件时，系统把一个指向此文件内部数据结构的指针写入文件描述符表，并把该表的索引值返回给调用者&nbsp;。应用程序只需记住这个描述符，并在以后操作该文件时使用它。操作系统把该描述符作为索引访问进程描述符表，通过指针找到保存该文件所有的信息的数据结构。</p>
+<p>&nbsp; &nbsp;&nbsp;<strong>&nbsp; 针对套接字的系统数据结构：</strong></p>
+<p>&nbsp; &nbsp;1）、套接字API里有个函数socket，它就是用来创建一个套接字。套接字设计的总体思路是，单个系统调用就可以创建任何套接字，因为套接字是相当笼统的。一旦套接字创建后，应用程序还需要调用其他函数来指定具体细节。例如调用socket将创建一个新的描述符条目：</p>
+
+<span data-filtered="filtered"><span data-filtered="filtered"><img src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/20140820234829419" alt=""></span></span>
+<p align="justify">&nbsp;</p>
+<p>&nbsp; &nbsp;2）、虽然套接字的内部数据结构包含很多字段，但是系统创建套接字后，大多数字字段没有填写。应用程序创建套接字后在该套接字可以使用之前，必须调用其他的过程来填充这些字段。</p>
+<h4><a name="t6"></a><strong>3、文件描述符和文件指针的区别：</strong></h4>
+<p>&nbsp;</p>
+<p><strong>文件描述符：</strong>在linux系统中打开文件就会获得文件描述符，它是个很小的正整数。每个进程在PCB（Process Control Block）中保存着一份文件描述符表，文件描述符就是这个表的索引，每个表项都有一个指向已打开文件的指针。</p>
+<p><strong>文件指针：</strong>C语言中使用文件指针做为I/O的句柄。文件指针指向进程用户区中的一个被称为FILE结构的数据结构。FILE结构包括一个缓冲区和一个文件描述符。而文件描述符是文件描述符表的一个索引，因此从某种意义上说文件指针就是句柄的句柄（在Windows系统上，文件描述符被称作文件句柄）。</p>
+
+<span data-filtered="filtered"><span data-filtered="filtered">详细内容请看<a href="http://blog.csdn.net/hguisu/article/details/6122513#t7" target="_blank">linux文件系统</a>：<a href="http://blog.csdn.net/hguisu/article/details/6122513#t7" target="_blank">http://blog.csdn.net/hguisu/article/details/6122513#t7</a></span></span>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h2><a name="t7"></a></h2>
+<p class="headline-1 bk-sidecatalog-title">4. 基本的SOCKET接口函数</p>
+<div>在生活中，A要电话给B，A拨号，B听到电话铃声后提起电话，这时A和B就建立起了连接，A和B就可以讲话了。等交流结束，挂断电话结束此次交谈。 &nbsp;打电话很简单解释了这工作原理：“open—write/read—close”模式。</div>
+<div>&nbsp;</div>
+
+<span data-filtered="filtered"><span data-filtered="filtered"><img src="http://my.csdn.net/uploads/201204/10/1334045011_9586.jpg" alt=""><br data-filtered="filtered"></span></span>
+<p>&nbsp;</p>
+<p align="justify">&nbsp;</p>
+<p align="justify">&nbsp; &nbsp; 服务器端先初始化Socket，然后与端口绑定(bind)，对端口进行监听(listen)，调用accept阻塞，等待客户端连接。在这时如果有个客户端初始化一个Socket，然后连接服务器(connect)，如果连接成功，这时客户端与服务器端的连接就建立了。客户端发送数据请求，服务器端接收请求并处理请求，然后把回应数据发送给客户端，客户端读取数据，最后关闭连接，一次交互结束。</p>
+<p align="justify">&nbsp; &nbsp; &nbsp;&nbsp;<strong>这些接口的实现都是内核来完成。具体如何实现，可以看看linux的内核</strong></p>
+<p align="justify">&nbsp;</p>
+<h3><a name="t8"></a>4.1、socket()函数</h3>
+<div>
+<pre>        int  <strong>socket</strong>(int protofamily, int type, int protocol);//返回sockfd</pre>
+</div>
+<p>&nbsp; &nbsp; &nbsp;sockfd是描述符。</p>
+<p>&nbsp;&nbsp;socket函数对应于普通文件的打开操作。普通文件的打开操作返回一个文件描述字，而<strong>socket()</strong>用于创建一个socket描述符（socket descriptor），它唯一标识一个socket。这个socket描述字跟文件描述字一样，后续的操作都有用到它，把它作为参数，通过它来进行一些读写操作。</p>
+<p>&nbsp; &nbsp; &nbsp; 正如可以给fopen的传入不同参数值，以打开不同的文件。创建socket的时候，也可以指定不同的参数创建不同的socket描述符，socket函数的三个参数分别为：</p>
+<ul>
+<li>protofamily：即协议域，又称为协议族（family）。常用的协议族有，AF_INET<span>(IPV4)、<span>AF_INET6(IPV6)、AF_LOCAL（或称AF_UNIX，Unix域socket）、AF_ROUTE等等。协议族决定了socket的地址类型，在通信中必须采用对应的地址，如AF_INET决定了要用ipv4地址（32位的）与端口号（16位的）的组合、AF_UNIX决定了要用一个绝对路径名作为地址。</span></span></li>
+<li>type：指定socket类型。常用的socket类型有，SOCK_STREAM、SOCK_DGRAM、SOCK_RAW、SOCK_PACKET、SOCK_SEQPACKET等等（socket的类型有哪些？）。</li>
+<li>protocol：故名思意，就是指定协议。常用的协议有，IPPROTO_TCP、IPPTOTO_UDP、IPPROTO_SCTP、IPPROTO_TIPC等，它们分别对应TCP传输协议、UDP传输协议、STCP传输协议、TIPC传输协议（这个协议我将会单独开篇讨论！）。</li>
+</ul>
+<p><strong>注意</strong>：并不是上面的type和protocol可以随意组合的，如SOCK_STREAM不可以跟IPPROTO_UDP组合。当protocol为0时，会自动选择type类型对应的默认协议。</p>
+<p>当我们调用<strong>socket</strong>创建一个socket时，返回的socket描述字它存在于协议族（address family，AF_XXX）空间中，但没有一个具体的地址。如果想要给它赋值一个地址，就必须调用bind()函数，否则就当调用connect()、listen()时系统会自动随机分配一个端口。</p>
+<h3><a name="t9"></a>4.2、bind()函数</h3>
+<p>正如上面所说bind()函数把一个地址族中的特定地址赋给socket。例如对应AF_INET、AF_INET6就是把一个ipv4或ipv6地址和端口号组合赋给socket。</p>
+<div>
+<pre>int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);</pre>
+</div>
+<p>函数的三个参数分别为：</p>
+<ul>
+<li>sockfd：即socket描述字，它是通过socket()函数创建了，唯一标识一个socket。bind()函数就是将给这个描述字绑定一个名字。</li>
+<li>addr：一个const&nbsp;struct&nbsp;sockaddr *指针，指向要绑定给sockfd的协议地址。这个地址结构根据地址创建socket时的地址协议族的不同而不同，如ipv4对应的是：&nbsp;<br data-filtered="filtered">
+<div>
+<pre>struct sockaddr_in {
+    sa_family_t    sin_family; /* address family: AF_INET */
+    in_port_t      sin_port;   /* port in network byte order */
+    struct in_addr sin_addr;   /* internet address */
+};
+
+/* Internet address. */
+struct in_addr {
+    uint32_t       s_addr;     /* address in network byte order */
+};</pre>
+</div>
+ipv6对应的是：&nbsp;<br data-filtered="filtered">
+<div>
+<pre>struct sockaddr_in6 { 
+    sa_family_t     sin6_family;   /* AF_INET6 */ 
+    in_port_t       sin6_port;     /* port number */ 
+    uint32_t        sin6_flowinfo; /* IPv6 flow information */ 
+    struct in6_addr sin6_addr;     /* IPv6 address */ 
+    uint32_t        sin6_scope_id; /* Scope ID (new in 2.4) */ 
+};
+
+struct in6_addr { 
+    unsigned char   s6_addr[16];   /* IPv6 address */ 
+};</pre>
+</div>
+Unix域对应的是：&nbsp;<br data-filtered="filtered">
+<div>
+<pre>#define UNIX_PATH_MAX    108
+
+struct sockaddr_un { 
+    sa_family_t sun_family;               /* AF_UNIX */ 
+    char        sun_path[UNIX_PATH_MAX];  /* pathname */ 
+};</pre>
+</div>
+</li>
+<li>addrlen：对应的是地址的长度。</li>
+</ul>
+<p>通常服务器在启动的时候都会绑定一个众所周知的地址（如ip地址+端口号），用于提供服务，客户就可以通过它来接连服务器；而客户端就不用指定，有系统自动分配一个端口号和自身的ip地址组合。这就是为什么通常服务器端在listen之前会调用bind()，而客户端就不会调用，而是在connect()时由系统随机生成一个。</p>
+<blockquote>
+<h3><a name="t10"></a>网络字节序与主机字节序</h3>
+<p><strong>主机字节序</strong>就是我们平常说的大端和小端模式：不同的CPU有不同的字节序类型，这些字节序是指整数在内存中保存的顺序，这个叫做主机序。引用标准的Big-Endian和Little-Endian的定义如下：</p>
+<p>　　a) Little-Endian就是低位字节排放在内存的低地址端，高位字节排放在内存的高地址端。</p>
+<p>　　b) Big-Endian就是高位字节排放在内存的低地址端，低位字节排放在内存的高地址端。</p>
+<p><strong>网络字节序</strong>：4个字节的32 bit值以下面的次序传输：首先是0～7bit，其次8～15bit，然后16～23bit，最后是24~31bit。这种传输次序称作大端字节序。<strong>由于TCP/IP首部中所有的二进制整数在网络中传输时都要求以这种次序，因此它又称作网络字节序。</strong>字节序，顾名思义字节的顺序，就是大于一个字节类型的数据在内存中的存放顺序，一个字节的数据没有顺序的问题了。</p>
+<p>所以：在将一个地址绑定到socket的时候，请先将主机字节序转换成为网络字节序，而不要假定主机字节序跟网络字节序一样使用的是Big-Endian。由于这个问题曾引发过血案！公司项目代码中由于存在这个问题，导致了很多莫名其妙的问题，所以请谨记对主机字节序不要做任何假定，务必将其转化为网络字节序再赋给socket。</p>
+</blockquote>
+<h3><a name="t11"></a>4.3、listen()、connect()函数</h3>
+<p>如果作为一个服务器，在调用socket()、<span>bind()之后就会调用listen()来监听这个socket，如果客户端这时调用connect()发出连接请求，服务器端就会接收到这个请求。</span></p>
+<div>
+<pre>int listen(int sockfd, int backlog);
+int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);</pre>
+</div>
+<p>listen函数的第一个参数即为要监听的socket描述字，第二个参数为相应socket可以排队的最大连接个数。socket()函数创建的socket默认是一个主动类型的，listen函数将socket变为被动类型的，等待客户的连接请求。</p>
+<p>connect函数的第一个参数即为客户端的socket描述字，第二参数为服务器的socket地址，第三个参数为socket地址的长度。客户端通过调用connect函数来建立与TCP服务器的连接。</p>
+<h3><a name="t12"></a>4.4、accept()函数</h3>
+<p>TCP服务器端依次调用socket()、<span>bind()、listen()之后，就会监听指定的socket地址了。TCP客户端依次调用socket()、<span>connect()之后就向TCP服务器发送了一个连接请求。TCP服务器监听到这个请求之后，就会调用<span>accept()函数取接收请求，这样连接就建立好了。之后就可以开始网络I/O操作了，即类同于普通文件的读写I/O操作。</span></span></span></p>
+<div>
+<pre>int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen); //返回连接connect_fd</pre>
+</div>
+<p>&nbsp;</p>
+<dl><dt>参数sockfd</dt><dd>参数sockfd就是上面解释中的监听套接字，这个套接字用来监听一个端口，当有一个客户与服务器连接时，它使用这个一个端口号，而此时这个端口号正与这个套接字关联。当然客户不知道套接字这些细节，它只知道一个地址和一个端口号。</dd><dt>参数addr</dt><dd>这是一个结果参数，它用来接受一个返回值，这返回值指定客户端的地址，当然这个地址是通过某个地址结构来描述的，用户应该知道这一个什么样的地址结构。如果对客户的地址不感兴趣，那么可以把这个值设置为NULL。</dd><dt>参数len</dt><dd>如同大家所认为的，它也是结果的参数，用来接受上述addr的结构的大小的，它指明addr结构所占有的字节个数。同样的，它也可以被设置为NULL。</dd></dl>
+<p>&nbsp;</p>
+<p>如果accept成功返回，则服务器与客户已经正确建立连接了，此时服务器通过accept返回的套接字来完成与客户的通信。</p>
+<p>注意：</p>
+<p>&nbsp; &nbsp; &nbsp; accept默认会阻塞进程，直到有一个客户连接建立后返回，它返回的是一个新可用的套接字，这个套接字是连接套接字。</p>
+<p>此时我们需要区分两种套接字，</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;监听套接字: 监听套接字正如accept的参数sockfd，它是监听套接字，在调用listen函数之后，是服务器开始调用socket()函数生成的，称为监听socket描述字(监听套接字)</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;连接套接字：一个套接字会从主动连接的套接字变身为一个监听套接字；而accept函数返回的是已连接s<span>ocket描述字(一个连接套接字)，它代表着一个网络已经存在的点点连接。</span></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 一个服务器通常通常仅仅只创建一个监听socket描述字，它在该服务器的生命周期内一直存在。内核为每个由服务器进程接受的客户连接创建了一个已连接socket描述字，当服务器完成了对某个客户的服务，相应的已连接socket描述字就被关闭。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 自然要问的是：为什么要有两种套接字？原因很简单，如果使用一个描述字的话，那么它的功能太多，使得使用很不直观，同时在内核确实产生了一个这样的新的描述字。</p>
+<p>连接套接字socketfd_new 并没有占用新的端口与客户端通信，依然使用的是与监听套接字socketfd一样的端口号</p>
+<h3><a name="t13"></a>4.5、read()、write()等函数</h3>
+<p>万事具备只欠东风，至此服务器与客户已经建立好连接了。可以调用网络I/O进行读写操作了，即实现了网咯中不同进程之间的通信！网络I/O操作有下面几组：</p>
+<ul>
+<li>read()/write()</li>
+<li>recv()/send()</li>
+<li>readv()/writev()</li>
+<li>recvmsg()/sendmsg()</li>
+<li>recvfrom()/sendto()</li>
+</ul>
+<p>我推荐使用recvmsg()/sendmsg()函数，这两个函数是最通用的I/O函数，实际上可以把上面的其它函数都替换成这两个函数。它们的声明如下：</p>
+<div>
+<pre>       #include &lt;unistd.h&gt;
+
+       ssize_t read(int fd, void *buf, size_t count);
+       ssize_t write(int fd, const void *buf, size_t count);
+
+       #include &lt;sys/types.h&gt;
+       #include &lt;sys/socket.h&gt;
+
+       ssize_t send(int sockfd, const void *buf, size_t len, int flags);
+       ssize_t recv(int sockfd, void *buf, size_t len, int flags);
+
+       ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+                      const struct sockaddr *dest_addr, socklen_t addrlen);
+       ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
+                        struct sockaddr *src_addr, socklen_t *addrlen);
+
+       ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags);
+       ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags);
+</pre>
+</div>
+<p>read函数是负责从fd中读取内容.当读成功时，read返回实际所读的字节数，如果返回的值是0表示已经读到文件的结束了，小于0表示出现了错误。如果错误为EINTR说明读是由中断引起的，如果是ECONNREST表示网络连接出了问题。</p>
+<p>write函数将buf中的nbytes字节内容写入文件描述符fd.成功时返回写的字节数。失败时返回-1，并设置errno变量。 在网络程序中，当我们向套接字文件描述符写时有俩种可能。1)write的返回值大于0，表示写了部分或者是全部的数据。2)返回的值小于0，此时出现了错误。我们要根据错误类型来处理。如果错误为EINTR表示在写的时候出现了中断错误。如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接)。</p>
+<p>其它的我就不一一介绍这几对I/O函数了，具体参见man文档或者baidu、Google，下面的例子中将使用到send/recv。</p>
+<h3><a name="t14"></a>4.6、close()函数</h3>
+<p>在服务器与客户端建立连接之后，会进行一些读写操作，完成了读写操作就要关闭相应的socket描述字，好比操作完打开的文件要调用fclose关闭打开的文件。</p>
+<div>
+<pre>#include &lt;unistd.h&gt;
+int close(int fd);</pre>
+</div>
+<p>close一个TCP socket的缺省行为时把该socket标记为以关闭，然后立即返回到调用进程。该描述字不能再由调用进程使用，也就是说不能再作为read或write的第一个参数。</p>
+<p>注意：close操作只是使相应socket描述字的引用计数-1，只有当引用计数为0的时候，才会触发TCP客户端向服务器发送终止连接请求。</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h2><a name="t15"></a></h2>
+<p class="headline-1 bk-sidecatalog-title">5. Socket中TCP的建立（三次握手）</p>
+<div>TCP协议通过三个报文段完成连接的建立，这个过程称为三次握手(three-way handshake)，过程如下图所示。</div>
+<p>&nbsp;</p>
+<p>第一次握手：建立连接时，客户端发送syn包(syn=j)到服务器，并进入SYN_SEND状态，等待服务器确认；SYN：同步序列编号(Synchronize Sequence Numbers)。</p>
+<p>第二次握手：服务器收到syn包，必须确认客户的SYN（ack=j+1），同时自己也发送一个SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；<br data-filtered="filtered">第三次握手：客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=k+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。<br data-filtered="filtered">一个完整的三次握手也就是：&nbsp;请求---应答---再次确认。</p>
+
+<span data-filtered="filtered"><span data-filtered="filtered">对应的函数接口：<br data-filtered="filtered">&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;<img src="http://my.csdn.net/uploads/201204/10/1334045728_5744.png" alt=""><br data-filtered="filtered"><br data-filtered="filtered"></span></span>
+<p>&nbsp;</p>
+
+<span data-filtered="filtered">从图中可以看出，当客户端调用connect时，触发了连接请求，向服务器发送了SYN J包，这时connect进入阻塞状态；服务器监听到连接请求，即收到SYN J包，调用accept函数接收请求向客户端发送SYN K ，ACK J+1，这时accept进入阻塞状态；客户端收到服务器的SYN K ，ACK J+1之后，这时connect返回，并对SYN K进行确认；服务器收到ACK K+1时，accept返回，至此三次握手完毕，连接建立。</span></div>
+<div>&nbsp;</div>
+<div>我们可以通过网络抓包的查看具体的流程：</div>
+<div>比如我们服务器开启9502的端口。使用tcpdump来抓包：</div>
+<div>&nbsp;</div>
+<div><strong>&nbsp;tcpdump -iany tcp port 9502</strong></div>
+<div>&nbsp;</div>
+<div>然后我们使用telnet 127.0.0.1 9502开连接.:</div>
+<div>telnet 127.0.0.1 9502</div>
+<div>&nbsp;</div>
+<div>14:12:45.104687 IP localhost.39870 &gt; localhost.9502: Flags [S], seq 2927179378, win 32792, options [mss 16396,sackOK,TS val 255474104 ecr 0,nop,wscale 3], length 0<strong>（1）</strong><br>14:12:45.104701 IP localhost.9502 &gt; localhost.39870: Flags [S.], seq 1721825043, ack 2927179379, win 32768, options [mss 16396,sackOK,TS val 255474104 ecr 255474104,nop,wscale 3], length 0 &nbsp;<strong>（2）</strong><br>14:12:45.104711 IP localhost.39870 &gt; localhost.9502: Flags [.], ack 1, win 4099, options [nop,nop,TS val 255474104 ecr 255474104], length 0 &nbsp;<strong>（3）</strong></div>
+<div><strong><br></strong>14:13:01.415407 IP localhost.39870 &gt; localhost.9502: Flags [P.], seq 1:8, ack 1, win 4099, options [nop,nop,TS val 255478182 ecr 255474104], length 7<br>14:13:01.415432 IP localhost.9502 &gt; localhost.39870: Flags [.], ack 8, win 4096, options [nop,nop,TS val 255478182 ecr 255478182], length 0<br>14:13:01.415747 IP localhost.9502 &gt; localhost.39870: Flags [P.], seq 1:19, ack 8, win 4096, options [nop,nop,TS val 255478182 ecr 255478182], length 18<br>14:13:01.415757 IP localhost.39870 &gt; localhost.9502: Flags [.], ack 19, win 4097, options [nop,nop,TS val 255478182 ecr 255478182], length 0</div>
+<div>&nbsp;</div>
+<div>
+<ul>
+<li>114:12:45.104687&nbsp;时间带有精确到微妙</li>
+<li>localhost.39870 &gt; localhost.9502&nbsp;表示通信的流向，39870是客户端，9502是服务器端</li>
+<li>[S] 表示这是一个SYN请求</li>
+<li>[S.] 表示这是一个SYN+ACK确认包:&nbsp;</li>
+<li>[.] 表示这是一个ACT确认包， (client)SYN-&gt;(server)SYN-&gt;(client)ACT 就是3次握手过程</li>
+<li>[P] 表示这个是一个数据推送，可以是从服务器端向客户端推送，也可以从客户端向服务器端推</li>
+<li>[F] 表示这是一个FIN包，是关闭连接操作，client/server都有可能发起</li>
+<li>[R] 表示这是一个RST包，与F包作用相同，但RST表示连接关闭时，仍然有数据未被处理。可以理解为是强制切断连接</li>
+<li>win 4099&nbsp;是指滑动窗口大小</li>
+<li>length 18指数据包的大小</li>
+
+</ul>
+
+</div>
+<div>&nbsp;</div>
+<div>我们看到&nbsp;<strong>（1）<strong>（2）<strong>（3）三步是建立tcp：</strong></strong></strong></div>
+<div><strong>第一次握手：</strong></div>
+<div>14:12:45.104687 IP localhost.39870 &gt; localhost.9502: Flags [S], seq 2927179378</div>
+<div>客户端IP localhost.39870&nbsp;(客户端的端口一般是自动分配的) 向服务器localhost.9502&nbsp;发送syn包(syn=j)到服务器》</div>
+<div>syn包(syn=j)&nbsp;： syn的seq=&nbsp;2927179378&nbsp; （j=2927179378）</div>
+<div>&nbsp;</div>
+<div><strong>第二次握手：</strong></div>
+<div>14:12:45.104701 IP localhost.9502 &gt; localhost.39870: Flags [S.], seq 1721825043, ack 2927179379,</div>
+<div>收到请求并确认：服务器收到syn包，并必须确认客户的SYN（ack=j+1），同时自己也发送一个SYN包（syn=k），即SYN+ACK包：<br>此时服务器主机自己的SYN：seq：y=&nbsp;syn&nbsp;seq 1721825043。<br>ACK为j+1&nbsp;=（ack=j+1）=ack 2927179379&nbsp;<br><br><br></div>
+<div><strong>第三次握手：</strong></div>
+<div>14:12:45.104711 IP localhost.39870 &gt; localhost.9502: Flags [.], ack 1,</div>
+<div>客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=k+1)</div>
+<div>&nbsp;</div>
+<div>客户端和服务器进入ESTABLISHED状态后，可以进行通信数据交互。此时和accept接口没有关系，即使没有accepte，也进行3次握手完成。</div>
+<div>连接出现连接不上的问题，一般是网路出现问题或者网卡超负荷或者是连接数已经满啦。</div>
+<div>&nbsp;</div>
+<div>紫色背景的部分：</div>
+<div>IP localhost.39870 &gt; localhost.9502: Flags [P.], seq 1:8, ack 1, win 4099, options [nop,nop,TS val 255478182 ecr 255474104], length 7</div>
+<div>客户端向服务器发送长度为7个字节的数据，</div>
+<div>&nbsp;</div>
+<div>IP localhost.9502 &gt; localhost.39870: Flags [.], ack 8, win 4096, options [nop,nop,TS val 255478182 ecr 255478182], length 0</div>
+<div>服务器向客户确认已经收到数据</div>
+<div>&nbsp;</div>
+<div>&nbsp;IP localhost.9502 &gt; localhost.39870: Flags [P.], seq 1:19, ack 8, win 4096, options [nop,nop,TS val 255478182 ecr 255478182], length 18</div>
+<div>然后服务器同时向客户端写入数据。</div>
+<div>&nbsp;</div>
+<div>&nbsp;IP localhost.39870 &gt; localhost.9502: Flags [.], ack 19, win 4097, options [nop,nop,TS val 255478182 ecr 255478182], length 0</div>
+<div>
+<div>客户端向服务器确认已经收到数据</div>
+<div>&nbsp;</div>
+
+这个就是tcp可靠的连接，每次通信都需要对方来确认。<br><br></div>
+<div>&nbsp;</div>
+<div>
+<p>&nbsp;</p>
+<h2><a name="t16"></a></h2>
+<p class="headline-1 bk-sidecatalog-title">6. TCP连接的终止（四次握手释放）</p>
+<div><span class="headline-content">建立一个连接需要三次握手，而终止一个连接要经过四次握手，这是由TCP的半关闭(half-close)造成的，如图：<br></span></div>
+<div><span class="headline-content"><img src="http://my.csdn.net/uploads/201204/10/1334046363_4881.jpg" alt=""><br></span></div>
+<div>
+<p align="left">&nbsp;</p>
+<p>由于TCP连接是全双工的，因此每个方向都必须单独进行关闭。这个原则是当一方完成它的数据发送任务后就能发送一个FIN来终止这个方向的连接。收到一个&nbsp;FIN只意味着这一方向上没有数据流动，一个TCP连接在收到一个FIN后仍能发送数据。首先进行关闭的一方将执行主动关闭，而另一方执行被动关闭。</p>
+<p>（1）客户端A发送一个FIN，用来关闭客户A到服务器B的数据传送（报文段4）。</p>
+<p>（2）服务器B收到这个FIN，它发回一个ACK，确认序号为收到的序号加1（报文段5）。和SYN一样，一个FIN将占用一个序号。</p>
+<p>（3）服务器B关闭与客户端A的连接，发送一个FIN给客户端A（报文段6）。</p>
+<p>（4）客户端A发回ACK报文确认，并将确认序号设置为收到序号加1（报文段7）。</p>
+
+<span class="headline-content">对应函数接口如图：</span></div>
+<p>&nbsp;</p>
+<p align="left"><img src="http://my.csdn.net/uploads/201204/10/1334046534_7834.png" alt=""></p>
+<p align="left">过程如下：</p>
+<ul>
+<li>
+<div align="left">某个应用进程首先调用close主动关闭连接，这时TCP发送一个FIN M；</div>
+
+</li>
+<li>
+<div align="left">另一端接收到FIN M之后，执行被动关闭，对这个FIN进行确认。它的接收也作为文件结束符传递给应用进程，因为FIN的接收意味着应用进程在相应的连接上再也接收不到额外数据；</div>
+
+</li>
+<li>
+<div align="left">一段时间之后，接收到文件结束符的应用进程调用close关闭它的socket。这导致它的TCP也发送一个FIN N；</div>
+
+</li>
+<li>
+<div align="left">接收到这个FIN的源发送端TCP对它进行确认。</div>
+
+</li>
+
+</ul>
+<p align="left">这样每个方向上都有一个FIN和ACK。</p>
+<p align="left">1．为什么建立连接协议是三次握手，而关闭连接却是四次握手呢？</p>
+<p align="left">这是因为服务端的LISTEN状态下的SOCKET当收到SYN报文的建连请求后，它可以把ACK和SYN（ACK起应答作用，而SYN起同步作用）放在一个报文里来发送。但关闭连接时，当收到对方的FIN报文通知时，它仅仅表示对方没有数据发送给你了；但未必你所有的数据都全部发送给对方了，所以你可以未必会马上会关闭SOCKET,也即你可能还需要发送一些数据给对方之后，再发送FIN报文给对方来表示你同意现在可以关闭连接了，所以它这里的ACK报文和FIN报文多数情况下都是分开发送的。</p>
+
+</div>
+<p align="justify">&nbsp;</p>
+<p align="left">2．为什么TIME_WAIT状态还需要等2MSL后才能返回到CLOSED状态？</p>
+<p align="left">这是因为虽然双方都同意关闭连接了，而且握手的4个报文也都协调和发送完毕，按理可以直接回到CLOSED状态（就好比从SYN_SEND状态到ESTABLISH状态那样）；但是因为我们必须要假想网络是不可靠的，你无法保证你最后发送的ACK报文会一定被对方收到，因此对方处于LAST_ACK状态下的SOCKET可能会因为超时未收到ACK报文，而重发FIN报文，所以这个TIME_WAIT状态的作用就是用来重发可能丢失的ACK报文。</p>
+<p align="left">&nbsp;</p>
+<p align="left">&nbsp;</p>
+<p align="left">&nbsp;</p>
+<p align="left">&nbsp;</p>
+<p>&nbsp;</p>
+<h2><a name="t17"></a></h2>
+<p class="headline-1 bk-sidecatalog-title">7. Socket编程实例</p>
+<p align="left">服务器端：一直监听本机的8000号端口，如果收到连接请求，将接收请求并接收客户端发来的消息，并向客户端返回消息。</p>
+<p align="left">&nbsp;</p>
+<div class="dp-highlighter bg_cpp"><ol class="dp-cpp" start="1">
+<li class="alt"><span class="comment">/*&nbsp;File&nbsp;Name:&nbsp;server.c&nbsp;*/&nbsp;&nbsp;</span></li>
+<li><span class="preprocessor">#include&lt;stdio.h&gt;&nbsp;&nbsp;</span></li>
+<li class="alt"><span class="preprocessor">#include&lt;stdlib.h&gt;&nbsp;&nbsp;</span></li>
+<li><span class="preprocessor">#include&lt;string.h&gt;&nbsp;&nbsp;</span></li>
+<li class="alt"><span class="preprocessor">#include&lt;errno.h&gt;&nbsp;&nbsp;</span></li>
+<li><span class="preprocessor">#include&lt;sys/types.h&gt;&nbsp;&nbsp;</span></li>
+<li class="alt"><span class="preprocessor">#include&lt;sys/socket.h&gt;&nbsp;&nbsp;</span></li>
+<li><span class="preprocessor">#include&lt;netinet/in.h&gt;&nbsp;&nbsp;</span></li>
+<li class="alt"><span class="preprocessor">#define&nbsp;DEFAULT_PORT&nbsp;8000&nbsp;&nbsp;</span></li>
+<li><span class="preprocessor">#define&nbsp;MAXLINE&nbsp;4096&nbsp;&nbsp;</span></li>
+<li class="alt"><span class="datatypes">int&nbsp;main(<span class="datatypes">int&nbsp;argc,&nbsp;<span class="datatypes">char**&nbsp;argv)&nbsp;&nbsp;</span></span></span></li>
+<li>{&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int&nbsp;&nbsp;&nbsp;&nbsp;socket_fd,&nbsp;connect_fd;&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">struct&nbsp;sockaddr_in&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;servaddr;&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">char&nbsp;&nbsp;&nbsp;&nbsp;buff[4096];&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;n;&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//初始化Socket&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if(&nbsp;(socket_fd&nbsp;=&nbsp;socket(AF_INET,&nbsp;SOCK_STREAM,&nbsp;0))&nbsp;==&nbsp;-1&nbsp;){&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"create&nbsp;socket&nbsp;error:&nbsp;%s(errno:&nbsp;%d)\n",strerror(errno),errno);&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;exit(0);&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//初始化&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;memset(&amp;servaddr,&nbsp;0,&nbsp;<span class="keyword">sizeof(servaddr));&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;servaddr.sin_family&nbsp;=&nbsp;AF_INET;&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;servaddr.sin_addr.s_addr&nbsp;=&nbsp;htonl(INADDR_ANY);<span class="comment">//IP地址设置成INADDR_ANY,让系统自动获取本机的IP地址。&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;servaddr.sin_port&nbsp;=&nbsp;htons(DEFAULT_PORT);<span class="comment">//设置的端口为DEFAULT_PORT&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//将本地地址绑定到所创建的套接字上&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if(&nbsp;bind(socket_fd,&nbsp;(<span class="keyword">struct&nbsp;sockaddr*)&amp;servaddr,&nbsp;<span class="keyword">sizeof(servaddr))&nbsp;==&nbsp;-1){&nbsp;&nbsp;</span></span></span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"bind&nbsp;socket&nbsp;error:&nbsp;%s(errno:&nbsp;%d)\n",strerror(errno),errno);&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;exit(0);&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//开始监听是否有客户端连接&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if(&nbsp;listen(socket_fd,&nbsp;10)&nbsp;==&nbsp;-1){&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"listen&nbsp;socket&nbsp;error:&nbsp;%s(errno:&nbsp;%d)\n",strerror(errno),errno);&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;exit(0);&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"======waiting&nbsp;for&nbsp;client's&nbsp;request======\n");&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">while(1){&nbsp;&nbsp;</span></li>
+<li><span class="comment">//阻塞直到有客户端连接，不然多浪费CPU资源。&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if(&nbsp;(connect_fd&nbsp;=&nbsp;accept(socket_fd,&nbsp;(<span class="keyword">struct&nbsp;sockaddr*)NULL,&nbsp;NULL))&nbsp;==&nbsp;-1){&nbsp;&nbsp;</span></span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"accept&nbsp;socket&nbsp;error:&nbsp;%s(errno:&nbsp;%d)",strerror(errno),errno);&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">continue;&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li class="alt"><span class="comment">//接受客户端传过来的数据&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;n&nbsp;=&nbsp;recv(connect_fd,&nbsp;buff,&nbsp;MAXLINE,&nbsp;0);&nbsp;&nbsp;</li>
+<li class="alt"><span class="comment">//向客户端发送回应数据&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if(!fork()){&nbsp;<span class="comment">/*紫禁城*/&nbsp;&nbsp;</span></span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if(send(connect_fd,&nbsp;<span class="string">"Hello,you&nbsp;are&nbsp;connected!\n",&nbsp;26,0)&nbsp;==&nbsp;-1)&nbsp;&nbsp;</span></span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;perror(<span class="string">"send&nbsp;error");&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;close(connect_fd);&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exit(0);&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;buff[n]&nbsp;=&nbsp;<span class="string">'\0';&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"recv&nbsp;msg&nbsp;from&nbsp;client:&nbsp;%s\n",&nbsp;buff);&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;close(connect_fd);&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;close(socket_fd);&nbsp;&nbsp;</li>
+<li class="alt">}&nbsp;&nbsp;</li>
+
+</ol></div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p align="justify">客户端：</p>
+<p align="justify">&nbsp;</p>
+<div class="dp-highlighter bg_cpp"><ol class="dp-cpp" start="1">
+<li class="alt"><span class="comment">/*&nbsp;File&nbsp;Name:&nbsp;client.c&nbsp;*/&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;</li>
+<li class="alt"><span class="preprocessor">#include&lt;stdio.h&gt;&nbsp;&nbsp;</span></li>
+<li><span class="preprocessor">#include&lt;stdlib.h&gt;&nbsp;&nbsp;</span></li>
+<li class="alt"><span class="preprocessor">#include&lt;string.h&gt;&nbsp;&nbsp;</span></li>
+<li><span class="preprocessor">#include&lt;errno.h&gt;&nbsp;&nbsp;</span></li>
+<li class="alt"><span class="preprocessor">#include&lt;sys/types.h&gt;&nbsp;&nbsp;</span></li>
+<li><span class="preprocessor">#include&lt;sys/socket.h&gt;&nbsp;&nbsp;</span></li>
+<li class="alt"><span class="preprocessor">#include&lt;netinet/in.h&gt;&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;</li>
+<li class="alt"><span class="preprocessor">#define&nbsp;MAXLINE&nbsp;4096&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;</li>
+<li><span class="datatypes">int&nbsp;main(<span class="datatypes">int&nbsp;argc,&nbsp;<span class="datatypes">char**&nbsp;argv)&nbsp;&nbsp;</span></span></span></li>
+<li class="alt">{&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int&nbsp;&nbsp;&nbsp;&nbsp;sockfd,&nbsp;n,rec_len;&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">char&nbsp;&nbsp;&nbsp;&nbsp;recvline[4096],&nbsp;sendline[4096];&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">char&nbsp;&nbsp;&nbsp;&nbsp;buf[MAXLINE];&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">struct&nbsp;sockaddr_in&nbsp;&nbsp;&nbsp;&nbsp;servaddr;&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if(&nbsp;argc&nbsp;!=&nbsp;2){&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"usage:&nbsp;./client&nbsp;&lt;ipaddress&gt;\n");&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;exit(0);&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if(&nbsp;(sockfd&nbsp;=&nbsp;socket(AF_INET,&nbsp;SOCK_STREAM,&nbsp;0))&nbsp;&lt;&nbsp;0){&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"create&nbsp;socket&nbsp;error:&nbsp;%s(errno:&nbsp;%d)\n",&nbsp;strerror(errno),errno);&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;exit(0);&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;memset(&amp;servaddr,&nbsp;0,&nbsp;<span class="keyword">sizeof(servaddr));&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;servaddr.sin_family&nbsp;=&nbsp;AF_INET;&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;servaddr.sin_port&nbsp;=&nbsp;htons(8000);&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if(&nbsp;inet_pton(AF_INET,&nbsp;argv[1],&nbsp;&amp;servaddr.sin_addr)&nbsp;&lt;=&nbsp;0){&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"inet_pton&nbsp;error&nbsp;for&nbsp;%s\n",argv[1]);&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;exit(0);&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if(&nbsp;connect(sockfd,&nbsp;(<span class="keyword">struct&nbsp;sockaddr*)&amp;servaddr,&nbsp;<span class="keyword">sizeof(servaddr))&nbsp;&lt;&nbsp;0){&nbsp;&nbsp;</span></span></span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"connect&nbsp;error:&nbsp;%s(errno:&nbsp;%d)\n",strerror(errno),errno);&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;exit(0);&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"send&nbsp;msg&nbsp;to&nbsp;server:&nbsp;\n");&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;fgets(sendline,&nbsp;4096,&nbsp;stdin);&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if(&nbsp;send(sockfd,&nbsp;sendline,&nbsp;strlen(sendline),&nbsp;0)&nbsp;&lt;&nbsp;0)&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"send&nbsp;msg&nbsp;error:&nbsp;%s(errno:&nbsp;%d)\n",&nbsp;strerror(errno),&nbsp;errno);&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;exit(0);&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if((rec_len&nbsp;=&nbsp;recv(sockfd,&nbsp;buf,&nbsp;MAXLINE,0))&nbsp;==&nbsp;-1)&nbsp;{&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;perror(<span class="string">"recv&nbsp;error");&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exit(1);&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;buf[rec_len]&nbsp;&nbsp;=&nbsp;<span class="string">'\0';&nbsp;&nbsp;</span></li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"Received&nbsp;:&nbsp;%s&nbsp;",buf);&nbsp;&nbsp;</span></li>
+<li>&nbsp;&nbsp;&nbsp;&nbsp;close(sockfd);&nbsp;&nbsp;</li>
+<li class="alt">&nbsp;&nbsp;&nbsp;&nbsp;exit(0);&nbsp;&nbsp;</li>
+<li>}&nbsp;&nbsp;</li>
+
+</ol></div>
+<p align="left">inet_pton 是Linux下IP地址转换函数，可以在将IP地址在“点分十进制”和“整数”之间转换 ，是inet_addr的扩展。</p>
+<p align="left">&nbsp;</p>
+<div class="dp-highlighter bg_cpp"><ol class="dp-cpp" start="1">
+<li class="alt"><span class="datatypes">int&nbsp;inet_pton(<span class="datatypes">int&nbsp;af,&nbsp;<span class="keyword">const&nbsp;<span class="datatypes">char&nbsp;*src,&nbsp;<span class="keyword">void&nbsp;*dst);<span class="comment">//转换字符串到网络地址:&nbsp;&nbsp;</span></span></span></span></span></span></li>
+
+</ol></div>
+<p>
+第一个参数af是地址族，转换后存在dst中<br>&nbsp; &nbsp; af = AF_INET:src为指向字符型的地址，即ASCII的地址的首地址（ddd.ddd.ddd.ddd格式的），函数将该地址转换为in_addr的结构体，并复制在*dst中<br>　　af =AF_INET6:src为指向IPV6的地址，函数将该地址转换为in6_addr的结构体，并复制在*dst中<br>如果函数出错将返回一个负值，并将errno设置为EAFNOSUPPORT，如果参数af指定的地址族和src格式不对，函数将返回0。</p>
+<p>&nbsp;</p>
+<p align="left">测试：</p>
+<p align="left">编译server.c</p>
+<p align="left">gcc -o server server.c</p>
+<p align="left">启动进程：</p>
+<p align="left">./server</p>
+<p align="left">显示结果：</p>
+<p align="left">======waiting for client's request======</p>
+<p align="left">并等待客户端连接。</p>
+<p align="left">编译 client.c</p>
+<p align="left">gcc -o client server.c</p>
+<p align="left">客户端去连接server：</p>
+<p align="left">./client 127.0.0.1&nbsp;</p>
+<p align="left">等待输入消息</p>
+<p align="left"><img src="http://my.csdn.net/uploads/201204/10/1334050427_5715.jpg" alt=""></p>
+<p align="left">发送一条消息，输入：c++</p>
+<p align="left"><img src="http://my.csdn.net/uploads/201204/10/1334050530_5798.jpg" alt=""></p>
+<p align="left">此时服务器端看到：</p>
+<p align="left"><img src="http://my.csdn.net/uploads/201204/10/1334050486_4744.jpg" alt=""></p>
+<p align="left">客户端收到消息：</p>
+<p align="left"><img src="http://my.csdn.net/uploads/201204/10/1334050530_5798.jpg" alt=""></p>
+<p align="left">&nbsp;</p>
+<p align="left">其实可以不用client,可以使用telnet来测试：</p>
+<p align="left">telnet 127.0.0.1 8000</p>
+<p align="left"><img src="http://my.csdn.net/uploads/201204/10/1334051778_7806.jpg" alt=""></p>
+<p align="left">&nbsp;</p>
+<p align="left">注意：</p>
+<p align="left">在ubuntu 编译源代码的时候，头文件types.h可能找不到。<br>使用dpkg -L libc6-dev | grep types.h 查看。<br>如果没有，可以使用<br>apt-get install libc6-dev安装。<br>如果有了，但不在/usr/include/sys/目录下，手动把这个文件添加到这个目录下就可以了。</p>
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block"><div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/jiangzhaowei/category/919489.html" target="_blank">linux 驱动</a></div>
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(8261174,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow(&#39;ccdc2631-8274-e311-8d02-90b11c0b17d6&#39;);" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/jiangzhaowei/" target="_blank"><img src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/20170629194504.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/jiangzhaowei/">江召伟</a><br>
+            <a href="https://home.cnblogs.com/u/jiangzhaowei/followees/">关注 - 35</a><br>
+            <a href="https://home.cnblogs.com/u/jiangzhaowei/followers/">粉丝 - 210</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow(&#39;ccdc2631-8274-e311-8d02-90b11c0b17d6&#39;);return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(8261174,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">3</span>
+    </div>
+    <div class="buryit" onclick="votePost(8261174,&#39;Bury&#39;)">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a href="https://www.cnblogs.com/jiangzhaowei/p/8260971.html" class="p_n_p_prefix">« </a> 上一篇：    <a href="https://www.cnblogs.com/jiangzhaowei/p/8260971.html" title="发布于 2018-01-10 21:51">socket编程原理</a>
+    <br>
+    <a href="https://www.cnblogs.com/jiangzhaowei/p/8261295.html" class="p_n_p_prefix">» </a> 下一篇：    <a href="https://www.cnblogs.com/jiangzhaowei/p/8261295.html" title="发布于 2018-01-10 22:38">网络互联参考模型</a>
+
+</div>
+</div>
+	</div>
+	
+	<div class="postfoot">
+		posted on 
+<span id="post-date">2018-01-10 22:31</span>&nbsp;<a href="https://www.cnblogs.com/jiangzhaowei/">江召伟</a> 阅读(<span id="post_view_count">40257</span>) 评论(<span id="post_comment_count">0</span>) <a href="https://i.cnblogs.com/EditPosts.aspx?postid=8261174" rel="nofollow"> 编辑</a> <a href="javascript:void(0)" onclick="AddToWz(8261174); return false;">收藏</a>
+
+	</div>
+</div>
+
+
+<script src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/highlight.min.js.download"></script>
+<script>markdown_highlight();</script>
+<script>
+    var allowComments = true, cb_blogId = 173451, cb_blogApp = 'jiangzhaowei', cb_blogUserGuid = 'ccdc2631-8274-e311-8d02-90b11c0b17d6';
+    var cb_entryId = 8261174, cb_entryCreatedDate = '2018-01-10 22:31', cb_postType = 1; 
+    loadViewCount(cb_entryId);
+</script><a name="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<script>
+    var commentManager = new blogCommentManager();
+    commentManager.renderComments(0);
+</script>
+
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="https://www.cnblogs.com/jiangzhaowei/p/8261174.html#" onclick="return RefreshPage();">刷新页面</a><a href="https://www.cnblogs.com/jiangzhaowei/p/8261174.html#top">返回顶部</a></div>
+    <div id="comment_form_container"><div class="login_tips">
+    注册用户登录后才能发表评论，请 
+    <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return login(&#39;commentform&#39;);">登录</a>
+     或 
+    <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return register();">注册</a>，
+    <a href="https://www.cnblogs.com/">访问</a> 网站首页。
+</div></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"><a href="https://cloud.tencent.com/act/pro/overseas?fromSource=gwzcw.3090393.3090393.3090393&amp;utm_medium=cpc&amp;utm_id=gwzcw.3090393.3090393.3090393" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-腾讯云&#39;)">【推荐】腾讯云海外1核2G云服务器低至2折，半价续费券限量免费领取！</a><br><a href="http://click.aliyun.com/m/1000081987/" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-阿里云&#39;)">【推荐】阿里云双11返场来袭，热门产品低至一折等你来抢！</a><br><a href="http://www.ucancode.com/index.htm" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-工控&#39;)">【推荐】超50万行VC++源码: 大型组态工控、电力仿真CAD与GIS源码库</a><br><a href="https://www.ctyun.cn/activity/20191111?hmsr=%E7%9C%8B%E7%9C%8B-%E5%8D%9A%E5%AE%A2%E5%9B%AD-%E5%8F%8C11-1106&amp;hmpl=&amp;hmcu=&amp;hmkw=&amp;hmci=" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-天翼云&#39;)">【推荐】天翼云双十一翼降到底，云主机11.11元起，抽奖送大礼</a><br><a href="https://www.uibot.com.cn/sem/bky.html" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-uibot_T2&#39;)">【推荐】流程自动化专家UiBot，体系化教程成就高薪RPA工程师</a><br><a href="https://www.qiniu.com/events/20191111?utm_campaign=2019_1111&amp;utm_content=cnblogs_1111&amp;utm_medium=banner&amp;utm_source=cnblogs&amp;utm_term=cnblogs_1111" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T2-七牛云&#39;)">【优惠】七牛云采购嘉年华，云存储、CDN等云产品低至1折</a><br></div>
+    <div id="opt_under_post"></div>
+    <script async="async" src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/gpt.js.download"></script>
+    <script>
+        var googletag = googletag || {};
+        googletag.cmd = googletag.cmd || [];
+    </script>
+    <script>
+        googletag.cmd.push(function () {
+            googletag.defineSlot("/1090369/C1", [300, 250], "div-gpt-ad-1546353474406-0").addService(googletag.pubads());
+            googletag.defineSlot("/1090369/C2", [468, 60], "div-gpt-ad-1539008685004-0").addService(googletag.pubads());
+            googletag.pubads().enableSingleRequest();
+            googletag.enableServices();
+        });
+    </script>
+    <div id="cnblogs_c1" class="c_ad_block">
+        <div id="div-gpt-ad-1546353474406-0" style="height:250px; width:300px;" data-google-query-id="CNSxuMX3ieYCFdQaKgodYqECdw"><div id="google_ads_iframe_/1090369/C1_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/1090369/C1_0" title="3rd party ad content" name="google_ads_iframe_/1090369/C1_0" width="300" height="250" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" style="border: 0px; vertical-align: bottom;" data-google-container-id="1" data-load-complete="true" src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/saved_resource.html"></iframe></div></div>
+    </div>
+    <div id="under_post_news"><div class="recomm-block"><b>相关博文：</b><br>·  <a title="socket编程问题" href="https://www.cnblogs.com/shiney/archive/2012/04/27/2473129.html" target="_blank" onclick="clickRecomItmem(2473129)">socket编程问题</a><br>·  <a title="Linux下基本TCP socket编程之服务器端" href="https://www.cnblogs.com/rain24/archive/2011/11/18/2253571.html" target="_blank" onclick="clickRecomItmem(2253571)">Linux下基本TCP socket编程之服务器端</a><br>·  <a title="Linux Socket 编程简介" href="https://www.cnblogs.com/sparkdev/p/8341134.html" target="_blank" onclick="clickRecomItmem(8341134)">Linux Socket 编程简介</a><br>·  <a title="linux c编程：网络编程" href="https://www.cnblogs.com/zhanghongfeng/p/7802728.html" target="_blank" onclick="clickRecomItmem(7802728)">linux c编程：网络编程</a><br>·  <a title="Socket理解" href="https://www.cnblogs.com/George1994/p/6035010.html" target="_blank" onclick="clickRecomItmem(6035010)">Socket理解</a><br>»  <a target="_blank" href="https://recomm.cnblogs.com/blogpost/8261174">更多推荐...</a><div id="cnblogs_t5"><a href="https://developer.aliyun.com/ask/257905?utm_content=g_1000088947" target="_blank" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;T5-阿里云开发者社区&#39;)">精品问答：Java 技术 1000 问</a></div></div></div>
+    <div id="cnblogs_c2" class="c_ad_block">
+        <div id="div-gpt-ad-1539008685004-0" style="height:60px; width:468px;" data-google-query-id="CNWxuMX3ieYCFdQaKgodYqECdw">
+            
+        <div id="google_ads_iframe_/1090369/C2_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/1090369/C2_0" title="3rd party ad content" name="google_ads_iframe_/1090369/C2_0" width="468" height="60" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" style="border: 0px; vertical-align: bottom;" data-google-container-id="2" data-load-complete="true" src="./Linux的SOCKET编程详解 - 江召伟 - 博客园_files/saved_resource(1).html"></iframe></div></div>
+    </div>
+    <div id="under_post_kb">
+<div class="itnews c_ad_block">
+    <b>最新 IT 新闻</b>:
+    <br>
+ ·              <a href="https://news.cnblogs.com/n/650115/" target="_blank">奥迪计划6年内在德裁员9500人 节约66亿美元转型电动化</a>
+            <br>
+ ·              <a href="https://news.cnblogs.com/n/650114/" target="_blank">买手机被骗6000元 理工男网购被骗后攻破骗子后台</a>
+            <br>
+ ·              <a href="https://news.cnblogs.com/n/650113/" target="_blank">高思教育正式更名为爱学习教育集团 并获腾讯D+轮战略投资</a>
+            <br>
+ ·              <a href="https://news.cnblogs.com/n/650112/" target="_blank">华为子公司底价拍得12万平商住地做人才房，售价不高于10050元/㎡</a>
+            <br>
+ ·              <a href="https://news.cnblogs.com/n/650111/" target="_blank">Facebook宣布收购VR音乐游戏开发商Beat Games</a>
+            <br>
+    » <a href="https://news.cnblogs.com/" title="IT 新闻" target="_blank">更多新闻...</a>
+</div></div>
+    <div id="HistoryToday" class="c_ad_block">
+<b>历史上的今天：</b>
+<br>
+
+2018-01-10    <a href="https://www.cnblogs.com/jiangzhaowei/p/8260971.html">socket编程原理</a>
+    <br>
+2018-01-10    <a href="https://www.cnblogs.com/jiangzhaowei/p/8260243.html">Linux查看物理CPU个数、核数、逻辑CPU个数</a>
+    <br>
+2018-01-10    <a href="https://www.cnblogs.com/jiangzhaowei/p/8260207.html">Markdown 使用指南</a>
+    <br>
+2018-01-10    <a href="https://www.cnblogs.com/jiangzhaowei/p/8258715.html">Linux  Socket</a>
+    <br>
+2018-01-10    <a href="https://www.cnblogs.com/jiangzhaowei/p/8258076.html">YoutubeAPI使用</a>
+    <br>
+2018-01-10    <a href="https://www.cnblogs.com/jiangzhaowei/p/8258019.html">Youtube API数据类型</a>
+    <br>
+2018-01-10    <a href="https://www.cnblogs.com/jiangzhaowei/p/8256920.html">Linux wpa_cli 调试方法</a>
+    <br>
+</div>
+    <script type="text/javascript">
+        fixPostBody();
+        setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+        deliverAdT2();
+        deliverAdC1();
+        deliverAdC2();
+        loadNewsAndKb();
+        loadBlogSignature();
+LoadPostCategoriesTags(cb_blogId, cb_entryId);        LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+        GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+        loadOptUnderPost();
+        GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+    </script>
+</div></div>
+
+
+</div>
+<div class="footer">
+<p id="footer">
+	Powered by: 
+	<br>
+	
+	
+<a href="https://www.cnblogs.com/" id="Footer1_Hyperlink3" style="font-size: 12px; font-family: Verdana">博客园</a>
+	<br>
+	Copyright © 2019 江召伟
+<br><span id="poweredby">Powered by .NET Core 3.0.0 on Linux</span>
+
+</p>
+
+
+</div>
+
+
+    
+
+
+</body></html>
