@@ -43,9 +43,10 @@
 
 
 ## Git中的分支合并
-> git branch
-> git pull 远程没有配置文件
-> 需要.git的config下设置
+-   git branch  
+-   git pull 远程没有配置文件 ，需要.git的config下设置  
+-   git clone远程的非master分支 
+  
 
   ## 栈溢出获取命令行控制
 - 编译时关闭栈溢出保护
