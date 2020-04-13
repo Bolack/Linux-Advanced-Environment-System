@@ -44,6 +44,8 @@
 
 ## Git中的分支合并
 > git branch
+> git pull 远程没有配置文件
+> 需要.git的config下设置
 
   ## 栈溢出获取命令行控制
 - 编译时关闭栈溢出保护
@@ -81,3 +83,4 @@
   >用于实现codeCover的插桩，但是dyninst的module包不完整，原因未知
 - dyninst_shalow_stack
   >使用影子栈的思想，检查返回地址是否准确
+
