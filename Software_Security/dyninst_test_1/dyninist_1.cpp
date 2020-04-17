@@ -1,0 +1,6 @@
+#include "vector"
+#include "BPatch.h"
+#include"BPatch_Vector.h"
+#include"BPatch_process.h"
+#include"BPatch_snippet.h"
+#include"BPatch_function.h"
