@@ -99,6 +99,7 @@ int Instrument(BPatch_binaryEdit *app, BPatch_image* image) {
 
 
 int main(int argc, char **argv) {
+    
     // Open the input binary
     BPatch_binaryEdit* app = bpatch.openBinary(argv[1]);
 

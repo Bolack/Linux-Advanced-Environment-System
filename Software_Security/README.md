@@ -84,4 +84,10 @@
   >用于实现codeCover的插桩，但是dyninst的module包不完整，原因未知
 - dyninst_shalow_stack
   >使用影子栈的思想，检查返回地址是否准确
+- dyninstSamples
+  >一些dyninst的例子 包含影子栈
+
+  ## vscode调试make生成文件
+  - 注释掉pretask
+  - 添加args
 

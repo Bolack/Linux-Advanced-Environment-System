@@ -1,0 +1,14 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Makefile",
+            "command": "make", 
+            "args":["/home/wangmin/桌面/SoftSecurity/dyninstSamples/simple_shadowstack/"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
