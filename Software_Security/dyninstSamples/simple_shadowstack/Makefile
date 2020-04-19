@@ -23,7 +23,7 @@ DYNINST_ROOT=/usr/local
 DEP_SIMPLE = -libdyninstAPI.so -lboost_system
 DYNINSTAPI= /home/wangmin/dyninst-9.3.2/dyninstAPI/src/
 
-all: SimpleShadowStack libshadowstack.so test
+all:  SimpleShadowStack libshadowstack.so test
 # -I 链接文件时目录
 # 
 SimpleShadowStack: SimpleShadowStack.cpp
@@ -35,7 +35,7 @@ libshadowstack.so: shadowstack.c
 	gcc -fPIC -shared -o libshadowstack.so shadowstack.c
 
 test: test.c
-	gcc -o test test.c
+	gcc -o test test.c -fno-stack-protector
 
 clean:
 	rm -f SimpleShadowStack test test.inst libshadowstack.so

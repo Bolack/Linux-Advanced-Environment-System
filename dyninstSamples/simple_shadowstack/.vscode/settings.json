@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "BPatch_binaryEdit.C": "cpp",
-        "BPatch_image.C": "cpp",
-        "addressSpace.C": "cpp",
-        "Command.C": "cpp",
-        "emitElf.C": "cpp"
-    }
-}

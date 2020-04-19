@@ -8,7 +8,6 @@ int zero() {
     return 0;
 }
 
-
 void bar(int y) {
     int buf[10];
     int i;
