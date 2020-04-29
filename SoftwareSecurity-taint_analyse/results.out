@@ -1,0 +1,61 @@
+Image name:/home/wangmin/Desktop/PIN/pin-3.7-97619-g0d0c92f4f-gcc-linux/source/tools/SoftwareSecurity/test
+ Section:  Address: 0 Type: 1 Size: 0
+ Section: .interp Address: 94094127207192 Type: 5 Size: 28
+ Section: .note.gnu.property Address: 94094127207224 Type: 5 Size: 32
+ Section: .note.gnu.build-id Address: 94094127207256 Type: 5 Size: 36
+ Section: .note.ABI-tag Address: 94094127207292 Type: 5 Size: 32
+ Section: .gnu.hash Address: 94094127207328 Type: 5 Size: 36
+ Section: .dynsym Address: 94094127207368 Type: 16 Size: 240
+ Section: .dynstr Address: 94094127207608 Type: 20 Size: 149
+ Section: .gnu.version Address: 94094127207758 Type: 5 Size: 20
+ Section: .gnu.version_r Address: 94094127207784 Type: 5 Size: 32
+ Section: .rela.dyn Address: 94094127207816 Type: 2 Size: 192
+ Section: .rela.plt Address: 94094127208008 Type: 2 Size: 96
+ Section: .init Address: 94094127210496 Type: 4 Size: 27
+ Section: .plt Address: 94094127210528 Type: 4 Size: 80
+ Section: .plt.got Address: 94094127210608 Type: 4 Size: 16
+ Section: .plt.sec Address: 94094127210624 Type: 4 Size: 64
+ Section: .text Address: 94094127210688 Type: 4 Size: 469
+ Section: .fini Address: 94094127211160 Type: 4 Size: 13
+ Section: .rodata Address: 94094127214592 Type: 5 Size: 56
+ Section: .eh_frame_hdr Address: 94094127214648 Type: 5 Size: 68
+ Section: .eh_frame Address: 94094127214720 Type: 5 Size: 264
+ Section: .init_array Address: 94094127222176 Type: 5 Size: 8
+ Section: .fini_array Address: 94094127222184 Type: 5 Size: 8
+ Section: .dynamic Address: 94094127222192 Type: 6 Size: 496
+ Section: .got Address: 94094127222688 Type: 8 Size: 96
+ Section: .data Address: 94094127222784 Type: 5 Size: 16
+ Section: .bss Address: 94094127222800 Type: 18 Size: 8
+ Section: .comment Address: 0 Type: 17 Size: 36
+ Section: .symtab Address: 0 Type: 15 Size: 1632
+ Section: .strtab Address: 0 Type: 19 Size: 572
+ Section: .shstrtab Address: 0 Type: 21 Size: 282
+Saving loader routine
+Saving loader routine
+Saving loader routine
+Saving loader routine
+Saving loader routine
+addr = 94094127210882 0
+addr = 94094127210887 0
+addr = 94094127210947 0
+addr = 94094127210970 0
+addr = 94094127210991 0
+addr = 94094127211015 0
+addr = 94094127211084 0
+Saving loader routine
+Find malloc at: 140424742831104
+Calling malloc at 59b
+[INFO]		malloc(1) = 7fb72eeb2190
+Saving new memory space for fffffffffffffffe
+Calling malloc at 49b
+[INFO]		malloc(1) = 7fb72eeb2740
+Saving new memory space for fffffffffffffffe
+Calling malloc at a
+[INFO]		malloc(1) = 7fb72eeb2bf0
+Saving new memory space for fffffffffffffffe
+Calling malloc at 98
+[INFO]		malloc(3) = 7fb72eeb2c00
+Saving new memory space for fffffffffffffffe
+Calling malloc at 22
+[INFO]		malloc(7fb72eeb2c80) = 7fb72eeb2ca0
+Saving new memory space for fffffffffffffffe
