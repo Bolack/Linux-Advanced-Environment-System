@@ -10,6 +10,7 @@ git remote add origin https://github.com/9DemonFox/Linux-Advanced-Environment-Sy
 git branch --set-upstream-to origin/google
 
 如果远程没有该分支，需要从本地推送
+$ git checkout -b name #(创建并且切换到分支)
 $ git push origin GCC-practice:GCC-practice
 Username for 'https://github.com': 9DemonFox
 Password for 'https://9DemonFox@github.com':
